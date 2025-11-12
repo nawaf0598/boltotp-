@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>أكواد OSN+ - احصل على كود التفعيل</title>
+    <meta name="description" content="احصل على كود تفعيل OSN+ الخاص بك">
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 min-h-screen flex items-center justify-center p-4">
+    <div class="w-full max-w-md">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <div class="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full mb-4 shadow-2xl">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                </svg>
+            </div>
+            <h1 class="text-4xl font-bold text-white mb-2">أكواد OSN+</h1>
+            <p class="text-purple-200">احصل على كود التفعيل الخاص بك</p>
+        </div>
+
+        <!-- Main Card -->
+        <div class="bg-white/10 backdrop-blur-lg rounded-3xl shadow-2xl p-8 border border-white/20">
+            <!-- Input Section -->
+            <div class="mb-6">
+                <label class="block text-white text-sm font-medium mb-2">
+                    البريد الإلكتروني
+                </label>
+                <div class="relative">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="absolute right-3 top-1/2 -translate-y-1/2 text-purple-300 w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    </svg>
+                    <input
+                        type="email"
+                        id="emailInput"
+                        placeholder="مثال: bolt5@mail4.uk"
+                        class="w-full pr-12 pl-4 py-3 bg-white/20 border border-white/30 rounded-xl text-white placeholder-purple-200 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent transition-all"
+                    />
+                </div>
+            </div>
+
+            <!-- Submit Button -->
+            <button
+                id="fetchBtn"
+                class="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-bold py-3 rounded-xl transition-all transform hover:scale-105 active:scale-95 shadow-lg flex items-center justify-center gap-2"
+            >
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                </svg>
+                احصل على الكود
+            </button>
+
+            <!-- Results -->
+            <div id="resultBox" class="mt-6 hidden"></div>
+
+            <!-- Info Box -->
+            <div class="mt-6 bg-blue-500/10 border border-blue-400/30 rounded-xl p-4">
+                <p class="text-blue-200 text-xs text-center">
+                    🔒 يمكنك عرض الكود <strong>مرتين فقط</strong> لحماية حسابك
+                </p>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="text-center mt-6 text-purple-200 text-sm">
+            <p>محمي بنظام أمان متقدم 🛡️</p>
+        </div>
+    </div>
+
+    <script>
+        // ⚙️ إعدادات Supabase
+        const SUPABASE_URL = 'https://iovzydurvpichkmpbnzg.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imlvdnp5ZHVydnBpY2hrbXBibnpnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI5MDI4MjAsImV4cCI6MjA3ODQ3ODgyMH0.pZKaYLhyJ1ZNo3KQYxlX30jpXMWIaoM6vFgjiIeeBhc';
+
+        const emailInput = document.getElementById('emailInput');
+        const fetchBtn = document.getElementById('fetchBtn');
+        const resultBox = document.getElementById('resultBox');
+
+        async function fetchCode() {
+            const email = emailInput.value.trim();
+            
+            if (!email) {
+                showError('الرجاء إدخال البريد الإلكتروني');
+                return;
+            }
+
+            // Show loading
+            fetchBtn.disabled = true;
+            fetchBtn.innerHTML = `
+                <svg class="animate-spin w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                جاري البحث...
+            `;
+            resultBox.classList.add('hidden');
+
+            try {
+                // 1. جلب البيانات
+                const response = await fetch(
+                    `${SUPABASE_URL}/rest/v1/osn_codes?email=eq.${encodeURIComponent(email)}&select=*`,
+                    {
+                        headers: {
+                            'apikey': SUPABASE_ANON_KEY,
+                            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+                        }
+                    }
+                );
+
+                if (!response.ok) throw new Error('فشل الاتصال بالخادم');
+
+                const data = await response.json();
+
+                if (data.length === 0) {
+                    showError('لم يتم العثور على كود لهذا البريد الإلكتروني');
+                    return;
+                }
+
+                const record = data[0];
+                const currentViews = record.view_count || 0;
+
+                // 2. التحقق من المحاولات
+                if (currentViews >= 2) {
+                    showError('⚠️ عذراً، تم استهلاك هذا الكود! (تم عرضه مرتين سابقاً)');
+                    return;
+                }
+
+                // 3. تحديث العداد
+                const updateResponse = await fetch(
+                    `${SUPABASE_URL}/rest/v1/osn_codes?id=eq.${record.id}`,
+                    {
+                        method: 'PATCH',
+                        headers: {
+                            'apikey': SUPABASE_ANON_KEY,
+                            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                            'Content-Type': 'application/json',
+                            'Prefer': 'return=representation'
+                        },
+                        body: JSON.stringify({
+                            view_count: currentViews + 1
+                        })
+                    }
+                );
+
+                if (!updateResponse.ok) throw new Error('فشل تحديث السجل');
+
+                // 4. عرض النتيجة
+                const viewsLeft = 2 - (currentViews + 1);
+                showSuccess(record.code, viewsLeft);
+
+            } catch (err) {
+                showError('حدث خطأ: ' + err.message);
+            } finally {
+                // Reset button
+                fetchBtn.disabled = false;
+                fetchBtn.innerHTML = `
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                    </svg>
+                    احصل على الكود
+                `;
+            }
+        }
+
+        function showSuccess(code, viewsLeft) {
+            const warningText = viewsLeft === 0 
+                ? '<span class="font-bold text-red-300">⚠️ تحذير: هذه آخر مرة! الكود لن يظهر مرة أخرى</span>'
+                : '<span class="text-yellow-300">💡 يمكنك عرض الكود مرة واحدة أخرى فقط</span>';
+
+            resultBox.innerHTML = `
+                <div class="bg-green-500/20 border border-green-400/50 rounded-xl p-6 backdrop-blur">
+                    <div class="flex items-center gap-3 mb-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-green-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <h3 class="text-white font-bold text-lg">تم العثور على الكود!</h3>
+                    </div>
+                    
+                    <div class="bg-white/20 rounded-lg p-4 mb-4">
+                        <p class="text-purple-200 text-sm mb-2">كود التفعيل:</p>
+                        <p class="text-5xl font-bold text-white text-center tracking-widest">${code}</p>
+                    </div>
+
+                    <div class="text-center text-sm">
+                        ${warningText}
+                    </div>
+                </div>
+            `;
+            resultBox.classList.remove('hidden');
+        }
+
+        function showError(message) {
+            resultBox.innerHTML = `
+                <div class="bg-red-500/20 border border-red-400/50 rounded-xl p-4 backdrop-blur flex items-start gap-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-red-300 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <p class="text-red-200 text-sm">${message}</p>
+                </div>
+            `;
+            resultBox.classList.remove('hidden');
+        }
+
+        // Event Listeners
+        fetchBtn.addEventListener('click', fetchCode);
+        emailInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') fetchCode();
+        });
+    </script>
+</body>
+</html>
